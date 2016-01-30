@@ -29,10 +29,19 @@ class Vec:
   def __init__(self, labels, function):
     self.D = labels
     self.f = function
-  
 
 def zero_vec(D):
   return Vec(D, {})
+
+def setItem(v, d, val): 
+  v.f[d] = val
+
+def getItem(v, d):
+  if d in v.f:
+    return v.f[d]
+  else
+    return 0
+
 
     
 v = Vec( {'A','B','C'}, {'A':1} )

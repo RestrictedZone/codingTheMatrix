@@ -12,6 +12,10 @@ def getitem(v,k):
     0
     """
     assert k in v.D
+    if k in v.f:
+        return v.f[k]
+    else:
+        return 0
     pass
 
 def setitem(v,k,val):
@@ -32,6 +36,7 @@ def setitem(v,k,val):
     0
     """
     assert k in v.D
+    v.D[k] = val
     pass
 
 def equal(u,v):
@@ -42,11 +47,11 @@ def equal(u,v):
     Consider using brackets notation u[...] and v[...] in your procedure
     to access entries of the input vectors.  This avoids some sparsity bugs.
 
-    >>> Vec({'a', 'b', 'c'}, {'a':0}) == Vec({'a', 'b', 'c'}, {'b':0})
+    >>> Vec(['a', 'b', 'c'], {'a':0}) == Vec(['a', 'b', 'c'], {'b':0})
     True
-    >>> Vec({'a', 'b', 'c'}, {'a': 0}) == Vec({'a', 'b', 'c'}, {})
+    >>> Vec(['a', 'b', 'c'], {'a': 0}) == Vec(['a', 'b', 'c'], {})
     True
-    >>> Vec({'a', 'b', 'c'}, {}) == Vec({'a', 'b', 'c'}, {'a': 0})
+    >>> Vec(['a', 'b', 'c'], {}) == Vec(['a', 'b', 'c'], {'a': 0})
     True
 
     Be sure that equal(u, v) checks equalities for all keys from u.f and v.f even if
@@ -68,7 +73,12 @@ def equal(u,v):
     False
     """
     assert u.D == v.D
-    pass
+    isZeroVec = True;
+    for key in u.f: if u.f[key] != 0: isZeroVec = False break
+    for key in v.f: if v.f[key] != 0: isZeroVec = False break
+    
+    if isZeroVec: return True
+    else : return u.f == v.f
 
 def add(u,v):
     """
@@ -105,6 +115,10 @@ def add(u,v):
     True
     """
     assert u.D == v.D
+    for key in v.f:
+        if key in u.f : u.f[key] = u.f[key] + v.f[key]
+        else : u.f[key] = v.f[key]
+        pass
     pass
 
 def dot(u,v):
@@ -159,6 +173,11 @@ def scalar_mul(v, alpha):
     >>> u == Vec({'x','y','z','w'},{'x':1,'y':2,'z':3,'w':4})
     True
     """
+    zero = Vec( v.D , {})
+    if alpha == 0: return zero
+    elif alpha == 1: return v
+    else : for key in v.f : v.f[key] = v.f[key] * alpha
+    return v
     pass
 
 def neg(v):
@@ -176,6 +195,8 @@ def neg(v):
     >>> -Vec({'a','b','c'}, {'a':1}) == Vec({'a','b','c'}, {'a':-1})
     True
     """
+    for key in v.f : v.f[key] = - v.f[key]
+    return v
     pass
 
 ###############################################################################################################################
