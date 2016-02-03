@@ -1,4 +1,5 @@
 # Copyright 2013 Philip N. Klein
+import copy
 
 def getitem(v,k):
     """
@@ -36,7 +37,7 @@ def setitem(v,k,val):
     0
     """
     assert k in v.D
-    v.D[k] = val
+    v.f[k] = val
     pass
 
 def equal(u,v):
@@ -74,8 +75,14 @@ def equal(u,v):
     """
     assert u.D == v.D
     isZeroVec = True;
-    for key in u.f: if u.f[key] != 0: isZeroVec = False break
-    for key in v.f: if v.f[key] != 0: isZeroVec = False break
+    for key in u.f: 
+        if u.f[key] != 0: 
+            isZeroVec = False 
+            break
+    for key in v.f: 
+        if v.f[key] != 0: 
+            isZeroVec = False 
+            break
     
     if isZeroVec: return True
     else : return u.f == v.f
@@ -115,11 +122,22 @@ def add(u,v):
     True
     """
     assert u.D == v.D
+    # check Zero Vector
+    if u.f == {} : 
+        return v
+    if v.f == {} :
+        return u
+    returnVec = Vec( copy.deepcopy(u.D) , copy.deepcopy(u.f) )
+
     for key in v.f:
-        if key in u.f : u.f[key] = u.f[key] + v.f[key]
-        else : u.f[key] = v.f[key]
+        if key in returnVec.f : returnVec.f[key] = returnVec.f[key] + v.f[key]
+        else : returnVec.f[key] = v.f[key]
         pass
     pass
+
+    return returnVec
+
+
 
 def dot(u,v):
     """
@@ -153,7 +171,18 @@ def dot(u,v):
     12
     """
     assert u.D == v.D
-    pass
+    mulVec = 0
+    for key in u.D:
+        temp1 = u.f.get(key)
+        temp2 = v.f.get(key)
+        if temp1 == None: 
+            temp1 = 0
+        if temp2 == None:
+            temp2 = 0
+        mulVec += temp1 * temp2
+
+    return mulVec
+
 
 def scalar_mul(v, alpha):
     """
@@ -174,11 +203,14 @@ def scalar_mul(v, alpha):
     True
     """
     zero = Vec( v.D , {})
+    returnVec = Vec( copy.deepcopy(v.D) , copy.deepcopy(v.f) )
     if alpha == 0: return zero
-    elif alpha == 1: return v
-    else : for key in v.f : v.f[key] = v.f[key] * alpha
-    return v
-    pass
+    elif alpha == 1: return returnVec
+    else : 
+        for key in returnVec.f : 
+            returnVec.f[key] = returnVec.f[key] * alpha
+    return returnVec
+
 
 def neg(v):
     """
@@ -195,9 +227,11 @@ def neg(v):
     >>> -Vec({'a','b','c'}, {'a':1}) == Vec({'a','b','c'}, {'a':-1})
     True
     """
-    for key in v.f : v.f[key] = - v.f[key]
-    return v
-    pass
+    returnVec = Vec( copy.deepcopy(v.D) , copy.deepcopy(v.f) )
+    for key in returnVec.f : 
+        returnVec.f[key] = - returnVec.f[key]
+    return returnVec
+
 
 ###############################################################################################################################
 
