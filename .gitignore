@@ -7,3 +7,7 @@ __pycache__/
 
 # python 2.x
 *.pyc
+
+# too big file
+chap13_eigenvector/inverseindex
+chap13_eigenvector/links.bin
