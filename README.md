@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# codingTheMatrix
-=======
 # Coding the Matrix
 
 * Forked resource from [HERE](resources.codingthematrix.com)
@@ -27,6 +24,7 @@ C:\...\chap1_the_function> python
 
 > in Linux: Modify Environment Variables in your console or ~/.bash_profile or ~/.bashrc
 
+- - -
 ```
 chap1_the_function$ export PYTHONSTARTUP=__init__.py
 
@@ -36,6 +34,3 @@ chap1_the_function$ python
 
 ...is Task 1.5.21 solution !
 ```
-
-- - -
->>>>>>> 65a901c68ebd2a04505a1e0c4f7f9c6333dded84
