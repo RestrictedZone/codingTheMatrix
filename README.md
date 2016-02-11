@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# codingTheMatrix
-=======
 # Coding the Matrix
 
 * Forked resource from [HERE](resources.codingthematrix.com)
