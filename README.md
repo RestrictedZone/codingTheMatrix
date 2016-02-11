@@ -1,6 +1,6 @@
 # Coding the Matrix
 
-* Forked resource from [HERE](resources.codingthematrix.com)
+* Forked resource from [HERE](http://resources.codingthematrix.com)
 
 #### Prerequisite
 
