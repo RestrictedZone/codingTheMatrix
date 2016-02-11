@@ -1,4 +1,9 @@
 .idea
 .DS_Store
 thumbs.db
-__pycache__
+
+# python 3.x
+__pycache__/
+
+# python 2.x
+*.pyc
