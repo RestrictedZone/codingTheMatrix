@@ -48,11 +48,11 @@ def equal(u,v):
     Consider using brackets notation u[...] and v[...] in your procedure
     to access entries of the input vectors.  This avoids some sparsity bugs.
 
-    >>> Vec(['a', 'b', 'c'], {'a':0}) == Vec(['a', 'b', 'c'], {'b':0})
+    >>> Vec({'a', 'b', 'c'}, {'a':0}) == Vec({'a', 'b', 'c'}, {'b':0})
     True
-    >>> Vec(['a', 'b', 'c'], {'a': 0}) == Vec(['a', 'b', 'c'], {})
+    >>> Vec({'a', 'b', 'c'}, {'a': 0}) == Vec({'a', 'b', 'c'}, {})
     True
-    >>> Vec(['a', 'b', 'c'], {}) == Vec(['a', 'b', 'c'], {'a': 0})
+    >>> Vec({'a', 'b', 'c'}, {}) == Vec({'a', 'b', 'c'}, {'a': 0})
     True
 
     Be sure that equal(u, v) checks equalities for all keys from u.f and v.f even if
@@ -74,18 +74,22 @@ def equal(u,v):
     False
     """
     assert u.D == v.D
-    isZeroVec = True;
-    for key in u.f: 
-        if u.f[key] != 0: 
-            isZeroVec = False 
-            break
-    for key in v.f: 
-        if v.f[key] != 0: 
-            isZeroVec = False 
-            break
+    isEqual = True;
+    for key in u.D: 
+        # Absolutly True [ None == None, None == 0, 0 == 0]
+        if u.f.get(key) == None or u.f.get(key) == 0 :
+            if v.f.get(key) == None or v.f.get(key) == 0 :
+                continue
+        # Absolutly False [ None != Not 0]
+        if u.f.get(key) == None or v.f.get(key) == None :
+                isEqual = False 
+                break
+        if u.f.get(key) != v.f.get(key) :
+            isEqual = False 
+            break            
     
-    if isZeroVec: return True
-    else : return u.f == v.f
+    return isEqual
+
 
 def add(u,v):
     """
@@ -221,7 +225,7 @@ def neg(v):
 
     >>> u = Vec({1,3,5,7},{1:1,3:2,5:3,7:4})
     >>> -u
-    Vec({1, 3, 5, 7},{1: -1, 3: -2, 5: -3, 7: -4})
+    Vec(set([1, 3, 5, 7]),{1: -1, 3: -2, 5: -3, 7: -4})
     >>> u == Vec({1,3,5,7},{1:1,3:2,5:3,7:4})
     True
     >>> -Vec({'a','b','c'}, {'a':1}) == Vec({'a','b','c'}, {'a':-1})
