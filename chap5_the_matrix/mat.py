@@ -1,5 +1,7 @@
 # Copyright 2013 Philip N. Klein
 import copy
+import sys
+sys.path.insert(0, "../chap3_the_vector")
 from vec import Vec
 
 #Test your Mat class over R and also over GF(2).  The following tests use only R.
@@ -14,7 +16,8 @@ def getitem(M, k):
     0
     """
     assert k[0] in M.D[0] and k[1] in M.D[1]
-    return M.f[k[0],k[1]]
+    if M.f.get( (k[0],k[1]) ) == None : return 0
+    else :                            return M.f.get( (k[0],k[1]) )
 
 def equal(A, B):
     """
@@ -43,8 +46,8 @@ def equal(A, B):
     isMatch = True
     getA = 0
     getB = 0
-    for a in A.D:
-        for b in B.D:
+    for a in A.D[0]:
+        for b in A.D[1]:
             if A.f.get( (a,b) ) == None : getA = 0
             else : getA = A.f.get( (a,b) )
             if B.f.get( (a,b) ) == None : getB = 0
@@ -52,6 +55,7 @@ def equal(A, B):
             if getA != getB: 
                 isMatch = False
                 break; 
+    return isMatch
 
 def setitem(M, k, val):
     """
@@ -71,6 +75,7 @@ def setitem(M, k, val):
     True
     """
     assert k[0] in M.D[0] and k[1] in M.D[1]
+    M.f[ (k[0],k[1]) ] = val
     pass
 
 def add(A, B):
@@ -99,18 +104,28 @@ def add(A, B):
     True
     """
     assert A.D == B.D
-    pass
+    # set values
+    cpMa = copy.deepcopy(A)
+    cpMb = copy.deepcopy(B)
+    zeroM = Mat( A.D , {} )
+
+    for b in cpMb.f : 
+        if cpMa.f.get( b ) == None :    # it is NEW! 
+            cpMa.f[b] = cpMb.f[b]
+        else :                          # it is exist!
+            cpMa.f[b] = cpMa.f[b] + cpMb.f[b]
+    return cpMa
 
 def scalar_mul(M, x):
     """
     Returns the result of scaling M by x.
 
-    >>> M = Mat(({1,3,5}, {2,4}), {(1,2):4, (5,4):2, (3,4):3})
+    >>> M = Mat((set([1,3,5]), set([2,4])), {(1,2):4, (5,4):2, (3,4):3})
     >>> 0*M == Mat(({1, 3, 5}, {2, 4}), {})
     True
     >>> 1*M == M
     True
-    >>> 0.25*M == Mat(({1,3,5}, {2,4}), {(1,2):1.0, (5,4):0.5, (3,4):0.75})
+    >>> 0.25*M == Mat((set([1,3,5]), set([2,4])), {(1,2):1.0, (5,4):0.5, (3,4):0.75})
     True
     """
     cpM = copy.deepcopy(M)
@@ -118,7 +133,8 @@ def scalar_mul(M, x):
         return Mat(cpM.D, {})
     if x == 1:
         return cpM
-    cpm = Mat( cpM.D, { (q,p):r for (p,q),r in cpM.f.getitems() } )
+    for key in cpM.f:
+        cpM.f[key] *= x
     return cpM
 
 def transpose(M):
@@ -135,7 +151,7 @@ def transpose(M):
     """
     cpM = copy.deepcopy(M)
 
-    cpM = Mat( (cpM.D[1], cpM.D[0]), {(q,p):v for (p,q),v in cpM.F.items() } )
+    cpM = Mat( (cpM.D[1], cpM.D[0]), {(q,p):v for (p,q),v in cpM.f.items() } )
     return cpM
 
 def vector_matrix_mul(v, M):
@@ -163,7 +179,15 @@ def vector_matrix_mul(v, M):
     True
     """
     assert M.D[0] == v.D
-    pass
+    result = Vec( M.D[1], {})
+    for key in M.f :
+        if result.f.get( key[1] ) == None : resultf = 0
+        else : resultf = result.f.get( key[1] )
+        if v.f.get(key[0]) == None : vf = 0
+        else : vf = v.f.get(key[0])
+        result.f[key[1]] = resultf + vf * M.f[key]
+
+    return result
 
 def matrix_vector_mul(M, v):
     """
@@ -190,7 +214,15 @@ def matrix_vector_mul(M, v):
     True
     """
     assert M.D[1] == v.D
-    pass
+    result = Vec( M.D[0], {})
+    for key in M.f :
+        if result.f.get( key[0] ) == None : resultf = 0
+        else : resultf = result.f.get( key[0] )
+        if v.f.get(key[1]) == None : vf = 0
+        else : vf = v.f.get(key[1])
+        result.f[key[0]] = resultf + vf * M.f[key]
+
+    return result
 
 def matrix_matrix_mul(A, B):
     """
@@ -219,7 +251,18 @@ def matrix_matrix_mul(A, B):
     True
     """
     assert A.D[1] == B.D[0]
-    pass
+    result = Mat( (A.D[0], B.D[1]), {})
+    for x in A.D[0]:
+        for y in B.D[1]:
+            for z in A.D[1]:
+                if A.f.get( (x,z) ) == None : af = 0
+                else : af = A.f.get( (x,z) )
+                if B.f.get( (z,y) ) == None : bf = 0
+                else : bf = B.f.get( (z,y) )
+                if result.f.get( (x,y) ) == None : rf = 0
+                else : rf = result.f.get( (x,y) )
+                result.f[(x,y)] = rf + af * bf
+    return result
 
 ################################################################################
 
@@ -239,16 +282,16 @@ class Mat:
         return (-1)*self
 
     def __mul__(self,other):
-        if Mat == type(other):
+        if isinstance(other, Mat):
             return matrix_matrix_mul(self,other)
-        elif Vec == type(other):
+        elif isinstance(other, Vec):
             return matrix_vector_mul(self,other)
         else:
             return scalar_mul(self,other)
             #this will only be used if other is scalar (or not-supported). mat and vec both have __mul__ implemented
 
     def __rmul__(self, other):
-        if Vec == type(other):
+        if isinstance(other, Vec):
             return vector_matrix_mul(other, self)
         else:  # Assume scalar
             return scalar_mul(self, other)
