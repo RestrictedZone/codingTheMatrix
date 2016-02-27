@@ -2,7 +2,7 @@
 import copy
 import sys
 sys.path.insert(0, "../chap3_the_vector")
-from vec import Vec
+from vec_imsukmin import Vec
 
 #Test your Mat class over R and also over GF(2).  The following tests use only R.
 
